@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { Reducer, useEffect, useReducer } from 'react';
 import { getPerson } from './getPerson';
 
 interface State {
@@ -28,7 +28,7 @@ function reducer(state: State, action: Action): State {
     }
 }
 export function PersonScore() {
-    const [{ name, score, loading }, dispatch] = useReducer(reducer, {
+    const [{ name, score, loading }, dispatch] = useReducer<Reducer<State, Action>>(reducer, {
         name: undefined,
         score: 0,
         loading: true,
