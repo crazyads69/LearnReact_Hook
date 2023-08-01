@@ -1,5 +1,14 @@
-import { Reducer, useEffect, useReducer } from 'react';
+import { Reducer, useEffect, useReducer, useRef, useMemo, useCallback } from 'react';
 import { getPerson } from './getPerson';
+import { Reset } from './Reset';
+function sillyExpensiveFunction() {
+    console.log('Executing silly function');
+    let sum = 0;
+    for (let i = 0; i < 100000; i++) {
+        sum += i;
+    }
+    return sum;
+}
 
 interface State {
     name: string | undefined;
@@ -33,8 +42,18 @@ export function PersonScore() {
         score: 0,
         loading: true,
     });
+    const addButtonRef = useRef<HTMLButtonElement>(null);
     useEffect(() => {
         getPerson().then(({ name }) => dispatch({ type: 'initialize', name }));
+    }, []);
+    useEffect(() => {
+        if (!loading) {
+            addButtonRef.current?.focus();
+        }
+    }, [loading]);
+    const expensiveCalculation = useMemo(() => sillyExpensiveFunction(), []);
+    const handleReset = useCallback(() => {
+        dispatch({ type: 'reset' });
     }, []);
     if (loading) {
         return <div>Loading ....</div>;
@@ -44,9 +63,12 @@ export function PersonScore() {
             <h3>
                 {name}, {score}
             </h3>
-            <button onClick={() => dispatch({ type: 'increment' })}>Add</button>
+            <p>{expensiveCalculation}</p>
+            <button ref={addButtonRef} onClick={() => dispatch({ type: 'increment' })}>
+                Add
+            </button>
             <button onClick={() => dispatch({ type: 'decrement' })}>Subtract</button>
-            <button onClick={() => dispatch({ type: 'reset' })}>Reset</button>
+            <Reset onClick={handleReset} />
         </div>
     );
 }
